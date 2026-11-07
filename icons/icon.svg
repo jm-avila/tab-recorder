@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Toolbar icon: the field recorder's two metal reels on an anodised body, with the record lamp. -->
+  <defs>
+    <radialGradient id="metal" cx="40%" cy="35%" r="75%">
+      <stop offset="0" stop-color="#f4f5f3" />
+      <stop offset="0.6" stop-color="#c3c8c5" />
+      <stop offset="1" stop-color="#959a97" />
+    </radialGradient>
+    <path id="flange" fill-rule="evenodd"
+      d="M0-25a25 25 0 1 0 0.01 0Z
+         M0-20a6 6 0 1 0 0.01 0Z
+         M12.1 1a6 6 0 1 0 0.01 0Z
+         M-12.1 1a6 6 0 1 0 0.01 0Z
+         M0-4a4 4 0 1 0 0.01 0Z" />
+  </defs>
+  <rect x="2" y="18" width="124" height="92" rx="18" fill="#232624" />
+  <circle cx="113" cy="31" r="6" fill="#ff4b3e" />
+  <line x1="34" y1="94" x2="94" y2="94" stroke="#a06a40" stroke-width="5" stroke-linecap="round" />
+  <g transform="translate(34 66)"><use href="#flange" fill="url(#metal)" /></g>
+  <g transform="translate(94 66) rotate(40)"><use href="#flange" fill="url(#metal)" /></g>
+</svg>

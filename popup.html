@@ -1,0 +1,148 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      /* A reporter's reel-to-reel field recorder: aluminium plate, metal reels, needle meters, piano keys. */
+      :root {
+        --alu: #c7cbc8;
+        --alu-dark: #a4a9a6;
+        --black: #232624;
+        --face: #eef0e4;
+        --tape: #4a2f1d;
+        --red: #d7362b;
+        --ink: #2d302e;
+        --engraved: 'DIN Condensed', 'Avenir Next Condensed', 'Arial Narrow', sans-serif;
+        --digits: 'DIN Alternate', 'Avenir Next', system-ui, sans-serif;
+      }
+      body {
+        margin: 0;
+        width: 280px;
+        color: var(--ink);
+        font: 15px/1.3 var(--engraved);
+        letter-spacing: 0.02em;
+        background:
+          repeating-linear-gradient(90deg, rgb(255 255 255 / 0.18) 0 1px, transparent 1px 3px),
+          linear-gradient(180deg, #d5d8d5, var(--alu) 40%, var(--alu-dark));
+      }
+
+      /* Deck: reels under a smoked window. */
+      .deck { display: block; width: 100%; height: auto; background: var(--black); }
+      .reel { transform-box: fill-box; transform-origin: center; }
+      .recording .reel { animation: spin 2.4s linear infinite; }
+      .recording .reel.take-up { animation-duration: 1.9s; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+
+      .panel { padding: 12px 14px 14px; }
+
+      /* Needle meters */
+      .meters { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      .meter {
+        display: block; width: 100%; height: auto; border-radius: 4px;
+        box-shadow: inset 0 0 0 2px var(--black), 0 1px 0 rgb(255 255 255 / 0.6);
+      }
+      .needle { transition: transform 60ms linear; }
+
+      /* Counter + lamp */
+      .readout { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+      .counter { display: flex; gap: 2px; font: 20px/1 var(--digits); font-variant-numeric: tabular-nums; }
+      .counter span {
+        width: 15px; padding: 4px 0 3px; text-align: center; color: #f3f3ee; border-radius: 2px;
+        background: linear-gradient(180deg, #0d0e0e, #3a3d3b 50%, #0d0e0e);
+      }
+      .counter span.sep { width: 6px; background: none; color: var(--ink); }
+      .status { display: flex; align-items: center; gap: 7px; font-size: 16px; }
+      .lamp {
+        width: 11px; height: 11px; border-radius: 50%; background: #6d2420;
+        box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.6), 0 1px 0 rgb(255 255 255 / 0.6);
+      }
+      .recording .lamp { background: #ff4b3e; box-shadow: 0 0 8px 2px rgb(255 75 62 / 0.7); }
+      .saving .lamp { background: #f2b33d; box-shadow: 0 0 6px 1px rgb(242 179 61 / 0.6); }
+
+      /* Piano keys */
+      .keys { display: grid; grid-template-columns: 1.4fr 1fr; gap: 6px; margin-top: 12px; padding: 6px; background: var(--black); border-radius: 5px; }
+      .key {
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        height: 44px; border: 0; border-radius: 3px; cursor: pointer;
+        font: 18px/1 var(--engraved); letter-spacing: 0.04em; color: var(--ink);
+        background: linear-gradient(180deg, #f2f3f0, #c9ccc8);
+        box-shadow: 0 5px 0 #6f7470, 0 6px 6px rgb(0 0 0 / 0.5);
+        transform: translateY(-4px);
+        transition: transform 80ms ease-out, box-shadow 80ms ease-out;
+      }
+      .key .glyph { width: 12px; height: 12px; background: var(--ink); }
+      #rec .glyph { border-radius: 50%; background: var(--red); }
+      .key:active:not(:disabled), .key.down { transform: translateY(0); box-shadow: 0 1px 0 #6f7470, 0 1px 2px rgb(0 0 0 / 0.5); }
+      #rec.down { background: linear-gradient(180deg, #e0e1dd, #b5b9b5); }
+      .key:disabled { cursor: default; }
+      .key:disabled:not(.down) { color: #7d827e; }
+      .key:disabled:not(.down) .glyph { opacity: 0.45; }
+      .key:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+
+      .note { margin: 10px 2px 0; font-size: 14px; overflow-wrap: anywhere; }
+      .note:empty { display: none; }
+      .note.error { color: #9e1f17; }
+
+      @media (prefers-reduced-motion: reduce) {
+        .recording .reel { animation: none; }
+        .needle, .key { transition: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <svg class="deck" viewBox="0 0 280 112" aria-hidden="true">
+      <defs>
+        <radialGradient id="metal" cx="40%" cy="35%" r="75%">
+          <stop offset="0" stop-color="#eef0ee" />
+          <stop offset="0.6" stop-color="#b9bebb" />
+          <stop offset="1" stop-color="#8d928f" />
+        </radialGradient>
+        <!-- Flange with three windows that show the tape pack underneath. -->
+        <path id="flange" fill-rule="evenodd"
+          d="M0-44a44 44 0 1 0 0.01 0Z
+             M0-38a12 12 0 1 0 0.01 0Z
+             M22.52 1a12 12 0 1 0 0.01 0Z
+             M-22.52 1a12 12 0 1 0 0.01 0Z" />
+        <g id="hub">
+          <circle r="11" fill="#2f3230" />
+          <circle r="4" fill="#0d0e0e" />
+          <path d="M-1.5-11h3v4h-3zM-1.5 7h3v4h-3z" fill="#0d0e0e" transform="rotate(30)" />
+          <path d="M-1.5-11h3v4h-3zM-1.5 7h3v4h-3z" fill="#0d0e0e" transform="rotate(90)" />
+          <path d="M-1.5-11h3v4h-3zM-1.5 7h3v4h-3z" fill="#0d0e0e" transform="rotate(150)" />
+        </g>
+      </defs>
+      <rect width="280" height="112" fill="#232624" />
+      <!-- Tape path: supply reel → heads → take-up reel. -->
+      <path id="tape" fill="none" stroke="#4a2f1d" stroke-width="2" d="" />
+      <rect x="126" y="98" width="28" height="10" rx="2" fill="#565b58" />
+      <rect x="134" y="98" width="12" height="4" fill="#9aa09c" />
+      <g transform="translate(66 52)">
+        <circle id="pack-supply" r="40" fill="#4a2f1d" />
+        <g class="reel supply"><use href="#flange" fill="url(#metal)" /><use href="#hub" /></g>
+      </g>
+      <g transform="translate(214 52)">
+        <circle id="pack-take-up" r="14" fill="#4a2f1d" />
+        <g class="reel take-up"><use href="#flange" fill="url(#metal)" /><use href="#hub" /></g>
+      </g>
+    </svg>
+
+    <div class="panel">
+      <div class="meters">
+        <svg class="meter" id="meter-tab" viewBox="0 0 120 64" role="img" aria-label="Meeting level"></svg>
+        <svg class="meter" id="meter-mic" viewBox="0 0 120 64" role="img" aria-label="Microphone level"></svg>
+      </div>
+
+      <div class="readout">
+        <div class="status"><span class="lamp"></span><span id="label">Ready</span></div>
+        <div class="counter" id="counter" aria-label="Elapsed time"></div>
+      </div>
+
+      <div class="keys">
+        <button class="key" id="rec"><span class="glyph"></span>Record</button>
+        <button class="key" id="stop"><span class="glyph"></span>Stop</button>
+      </div>
+      <p id="note" class="note"></p>
+    </div>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

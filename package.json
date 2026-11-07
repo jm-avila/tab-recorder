@@ -1,0 +1,19 @@
+{
+  "name": "tab-recorder",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Minimal Chrome extension: record a tab with its audio and the mic, saved locally",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test": "node --test test/lib.test.js",
+    "test:e2e": "node --test --test-timeout=120000 test/e2e.test.js",
+    "screenshots": "node test/screenshots.js",
+    "icons": "node icons/render.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.65.0"
+  }
+}

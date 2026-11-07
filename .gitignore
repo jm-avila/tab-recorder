@@ -1,0 +1,4 @@
+node_modules/
+test/screenshots/*
+!test/screenshots/live-recording.png
+.DS_Store
